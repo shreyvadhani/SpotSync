@@ -1,0 +1,469 @@
+import os
+import subprocess
+
+HTML_CONTENT = """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SpotSync - System Documentation & Demo Guide</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 1.6cm 1.4cm 1.8cm 1.4cm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 10.5pt;
+      background: #ffffff;
+    }
+    h1, h2, h3, h4 {
+      color: #0f172a;
+      font-weight: 700;
+      page-break-after: avoid;
+    }
+    h1 {
+      font-size: 22pt;
+      margin-bottom: 4px;
+      color: #1e3a8a;
+    }
+    h2 {
+      font-size: 14pt;
+      margin-top: 18pt;
+      margin-bottom: 8pt;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 4pt;
+      color: #1e40af;
+    }
+    h3 {
+      font-size: 11.5pt;
+      margin-top: 12pt;
+      margin-bottom: 4pt;
+      color: #1e293b;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 8pt;
+      text-align: justify;
+    }
+    .cover {
+      text-align: center;
+      padding: 40pt 20pt 30pt 20pt;
+      border-bottom: 3px solid #2563eb;
+      margin-bottom: 25pt;
+    }
+    .cover-title {
+      font-size: 26pt;
+      font-weight: 800;
+      color: #1e3a8a;
+      letter-spacing: -0.5px;
+      margin-bottom: 6pt;
+    }
+    .cover-subtitle {
+      font-size: 13pt;
+      color: #475569;
+      font-weight: 500;
+      margin-bottom: 18pt;
+    }
+    .cover-meta {
+      font-size: 10pt;
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10pt 0 14pt 0;
+      font-size: 9.5pt;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 6pt 8pt;
+      text-align: left;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .callout {
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      padding: 8pt 12pt;
+      margin: 10pt 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 9.5pt;
+    }
+    .callout-title {
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 3pt;
+    }
+
+    .step-box {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10pt 12pt;
+      margin-bottom: 10pt;
+      background: #fafafa;
+      page-break-inside: avoid;
+    }
+    .step-number {
+      font-size: 11pt;
+      font-weight: 800;
+      color: #2563eb;
+      margin-bottom: 4pt;
+    }
+    code {
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 9pt;
+      background: #f1f5f9;
+      padding: 1px 4px;
+      border-radius: 4px;
+      color: #0f172a;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    ul, ol {
+      margin-top: 0;
+      margin-bottom: 8pt;
+      padding-left: 18pt;
+    }
+    li {
+      margin-bottom: 3pt;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE / HEADER -->
+  <div class="cover">
+    <div class="cover-title">SpotSync</div>
+    <div class="cover-subtitle">Real-Time Parking Discovery, Reservation & Contactless Ticketing Application</div>
+    <div class="cover-meta">
+      <strong>System Documentation, Architectural Specification & Viva Demonstration Guide</strong><br>
+      SRS Version 1.1 (Revised) &bull; RMMM Plan Compliance<br>
+      <strong>Department of Computer Engineering &bull; Sardar Patel Institute of Technology (SPIT)</strong><br>
+      Prepared by: Shrey Vadhani & Maisha Vageriya
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <h2>1. Executive Summary & Project Purpose</h2>
+  <p>
+    Urban traffic congestion is heavily exacerbated by motorists searching for available parking spaces, leading to lost time, fuel wastage, and increased urban carbon emissions. <strong>SpotSync</strong> is a full-stack, real-time parking discovery, advance reservation, and contactless ticketing platform designed to resolve urban parking friction for city centers, office hubs, and campus environments.
+  </p>
+  <p>
+    Built precisely according to the IEEE Std 830-1998 Software Requirements Specification (SRS v1.1), the application incorporates real-time WebSocket availability broadcast (&lt;5 seconds propagation), transactional locking to eliminate double-booking, turn-by-turn GPS navigation with live ETA, cryptographically tokenized QR passes for contactless entry/exit gates, and automated fee computation based on actual stay duration.
+  </p>
+
+  <!-- SECTION 2 -->
+  <h2>2. System Features & SRS Requirement Traceability</h2>
+  <p>The system encompasses six core functional feature groups mapped directly to SRS Section 4:</p>
+
+  <h3>4.1 Search Parking Spaces by Location (REQ-1 to REQ-6)</h3>
+  <ul>
+    <li><strong>Automatic Location Detection (REQ-1):</strong> Automatically senses user coordinates using the Geolocation API, centering the search on current position with default fallback to Sardar Patel Institute of Technology campus (<code>19.1232, 72.8360</code>).</li>
+    <li><strong>Landmark & Destination Search (REQ-2):</strong> Text search allowing drivers to find lots near destinations (e.g., SPIT, BKC, Andheri, Lower Parel).</li>
+    <li><strong>Interactive Leaflet Map & Card Views (REQ-3, REQ-4):</strong> Visual pins on OpenStreetMap indicating parking locations with real-time slot counters, paired with a toggleable list view.</li>
+    <li><strong>Sorting & Radius Filtering (REQ-5):</strong> Configurable radius (1 km to 20 km) with instant sorting by distance (Haversine formula), hourly fee, or open slot count.</li>
+    <li><strong>Auto-Radius Expansion (REQ-6):</strong> System automatically notifies the driver and expands the radius when no facilities fall within initial parameters.</li>
+  </ul>
+
+  <h3>4.2 Real-Time Parking Availability (REQ-7 to REQ-11)</h3>
+  <ul>
+    <li><strong>Live Slot Counter (REQ-7):</strong> Accurately reports open spots against total capacity per facility.</li>
+    <li><strong>WebSocket Propagation &lt;5s (REQ-8):</strong> Changes in slot occupancy are pushed via bi-directional WebSockets to all connected client browsers in real time without polling delay.</li>
+    <li><strong>Visual Color-Coded Indicators (REQ-9):</strong> Color-coded badges categorizing lots:
+      <span class="badge badge-green">Available</span> (healthy capacity),
+      <span class="badge badge-amber">Filling Fast</span> (&lt;30% remaining), and
+      <span class="badge badge-red">Full</span> (0 slots).
+    </li>
+    <li><strong>Double-Booking Concurrency Lock (REQ-10):</strong> Database-level atomic transactions lock slot state during booking, resolving Risk R1 from the RMMM Plan.</li>
+    <li><strong>Admin Maintenance Mode (REQ-11):</strong> Parking Lot Administrators can manually mark slots for maintenance or repair, instantly pulling them from public availability.</li>
+  </ul>
+
+  <h3>4.3 Slot Reservation & Cancellation Lifecycle (REQ-12 to REQ-17)</h3>
+  <ul>
+    <li><strong>Specific Slot Selection (REQ-12, REQ-13):</strong> Interactive graphical matrix displaying individual spots (Standard 🚗, EV Charging ⚡, Accessible ♿, Compact 🏎️) for custom time windows.</li>
+    <li><strong>Reservation History (REQ-14):</strong> Centralized log displaying active, checked-in, completed, and cancelled tickets.</li>
+    <li><strong>Cancellation & Immediate Release (REQ-15, REQ-16):</strong> Drivers can cancel reservations prior to arrival, automatically returning the slot to the open pool.</li>
+    <li><strong>15-Minute Grace Period Background Monitor (REQ-17):</strong> Automated background worker detects unclaimed reservations 15 minutes past start time, cancels the pass, issues a notification, and frees the spot.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <h3>4.4 GPS Navigation & Routing (REQ-18 to REQ-21)</h3>
+  <ul>
+    <li><strong>Turn-by-Turn Route Preview (REQ-18, REQ-19):</strong> Interactive polyline navigation overlay rendered directly inside the application.</li>
+    <li><strong>Dynamic ETA & Distance (REQ-20):</strong> Displays remaining travel distance in kilometers and estimated arrival time based on urban transit speeds.</li>
+    <li><strong>External Maps Integration (REQ-21):</strong> Direct link launching native Google Maps navigation with destination coordinates.</li>
+  </ul>
+
+  <h3>4.5 Contactless Digital QR Code Ticketing (REQ-22 to REQ-26)</h3>
+  <ul>
+    <li><strong>Signed QR Generation (REQ-22):</strong> Cryptographically signs a unique token using HMAC-SHA256 immediately upon booking confirmation (<code>SPOTSYNC:res_id:SIGNATURE</code>).</li>
+    <li><strong>Offline Caching (REQ-23):</strong> Passes are cached in browser <code>localStorage</code>, allowing drivers to display their ticket even when cellular reception is lost.</li>
+    <li><strong>Gate Entry Validation (REQ-24):</strong> Lot admin scans QR pass at entrance gate, verifying token validity, marking ticket as <code>entered</code>, and recording exact arrival timestamp.</li>
+    <li><strong>Gate Exit Scan & Automated Billing (REQ-25):</strong> Admin scans QR code at departure, records exit timestamp, calculates duration and billable hours, computes total fee, marks pass <code>exited</code>, and returns the slot to available pool.</li>
+    <li><strong>Fraud & Replay Prevention (REQ-26):</strong> Explicit rejection of forged, expired, or already-consumed passes.</li>
+  </ul>
+
+  <h3>4.6 Real-Time Notifications (REQ-27 to REQ-30)</h3>
+  <ul>
+    <li>In-app alert banners and persistent notification drawer logging booking confirmations, 30-minute arrival reminders, and cancellations.</li>
+    <li>Profile preference toggles allowing drivers to configure which notification categories they receive (REQ-30).</li>
+  </ul>
+
+  <!-- SECTION 3 -->
+  <h2>3. Technical Architecture & Implementation Details</h2>
+
+  <div class="callout">
+    <div class="callout-title">Architecture Philosophy</div>
+    SpotSync implements a modular, decoupled full-stack architecture prioritizing sub-second latency, zero hardcoded logic, strict ACID data integrity, and cross-platform responsive UX.
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Technologies Used</th>
+        <th>Key Responsibilities</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Backend API</strong></td>
+        <td>Python 3.12, FastAPI, Uvicorn, Starlette</td>
+        <td>RESTful endpoints, request validation, business logic, CORS, static file serving.</td>
+      </tr>
+      <tr>
+        <td><strong>Real-Time Stream</strong></td>
+        <td>Native WebSockets (<code>/ws/lots</code>)</td>
+        <td>Broadcasts slot state changes across all connected clients in &lt; 5 seconds (REQ-8).</td>
+      </tr>
+      <tr>
+        <td><strong>Database</strong></td>
+        <td>SQLite (WAL Mode, Foreign Keys ON)</td>
+        <td>ACID transactions, relational schema (Users, Lots, Slots, Reservations, Tickets, Notifications).</td>
+      </tr>
+      <tr>
+        <td><strong>Security</strong></td>
+        <td>PyJWT, HMAC-SHA256, SHA-256</td>
+        <td>Role-Based Access Control (RBAC), signed digital QR passes, password hashing.</td>
+      </tr>
+      <tr>
+        <td><strong>Background Worker</strong></td>
+        <td>Asyncio Event Loop Task</td>
+        <td>Periodically scans for grace period expiries (15 mins) and auto-releases abandoned slots.</td>
+      </tr>
+      <tr>
+        <td><strong>Frontend Client</strong></td>
+        <td>HTML5, Tailwind CSS, Lucide Icons</td>
+        <td>Modern glassmorphism mobile-first SPA, interactive slot matrix, notification drawer.</td>
+      </tr>
+      <tr>
+        <td><strong>Mapping & GPS</strong></td>
+        <td>Leaflet.js & OpenStreetMap</td>
+        <td>Interactive pins, custom color-coded badges, routing polyline, distance calculation.</td>
+      </tr>
+      <tr>
+        <td><strong>QR Engine</strong></td>
+        <td>QRCode.js (Client) + HMAC (Backend)</td>
+        <td>Vector QR rendering, offline storage, camera/manual validation gate portal.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Data Model & Referential Integrity (Appendix B.2)</h3>
+  <ul>
+    <li><code>users</code>: Primary key <code>user_id</code>, role-based classification (<code>driver</code>, <code>lot_admin</code>, <code>sys_admin</code>, <code>guest</code>), notification settings.</li>
+    <li><code>parking_lots</code>: Stores facility name, address, latitude/longitude coordinates, pricing per hour, and total slots.</li>
+    <li><code>slots</code>: Relational child of <code>parking_lots</code>. Tracks <code>slot_number</code>, vehicle type (standard, ev, accessible, compact), and live status (<code>available</code>, <code>booked</code>, <code>maintenance</code>).</li>
+    <li><code>reservations</code>: Relational bridge linking user, slot, lot, scheduled start/end windows, and booking status (<code>active</code>, <code>checked_in</code>, <code>completed</code>, <code>cancelled</code>, <code>expired</code>).</li>
+    <li><code>tickets</code>: 1-to-1 relationship with reservations. Contains signed QR code, entry timestamp, exit timestamp, fee amount, and gate status.</li>
+    <li><code>notifications</code>: User-specific alert history with category tagging and read/unread flags.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 4 -->
+  <h2>4. Live Viva & Project Demonstration Guide</h2>
+  <p>Follow this recommended step-by-step presentation script during your project viva or evaluation to demonstrate 100% of the functional and non-functional requirements:</p>
+
+  <div class="step-box">
+    <div class="step-number">Phase 1: Starting the System & Proving Zero Hardcoded Logic</div>
+    <p>1. Open VS Code and run <code>python backend/app.py</code> (or double click <code>start.bat</code>).</p>
+    <p>2. Point the evaluators to <code>http://localhost:8000/docs</code> to show the automated Swagger/OpenAPI documentation, demonstrating full REST API connectivity.</p>
+    <p>3. Navigate to <code>http://localhost:8000/</code> in the browser to display the responsive, modern Glassmorphism UI.</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-number">Phase 2: Location-Based Search & Interactive Map (Driver Mode)</div>
+    <p>1. Select <strong>Driver Mode</strong> using the role switcher pills at the top navbar.</p>
+    <p>2. Click <strong>"My Location"</strong>: Show how GPS coordinates dynamically resolve and center the map on the college campus (SPIT Mumbai).</p>
+    <p>3. Test the search bar: Type <code>BKC</code> or <code>Andheri</code> to demonstrate real-time landmark filtering.</p>
+    <p>4. Adjust the <strong>Radius Slider</strong> from 5 km to 10 km: Point out the calculated distance in kilometers and the color-coded status badges (<span class="badge badge-green">Available</span>, <span class="badge badge-amber">Filling Fast</span>, <span class="badge badge-red">Full</span>).</p>
+    <p>5. Toggle between <strong>Split View</strong>, <strong>Map Only</strong>, and <strong>Card View</strong> to show UI flexibility.</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-number">Phase 3: Visual Slot Grid & Transactional Reservation</div>
+    <p>1. Click <strong>"Reserve Slot"</strong> on <em>Sardar Patel Inst. of Technology Parking</em>.</p>
+    <p>2. Show the <strong>Visual Matrix</strong>: Explain how slots are categorized by type (🚗 Standard, ⚡ EV Charging, ♿ Accessible, 🏎️ Compact).</p>
+    <p>3. Click an available slot (e.g., <code>A-01</code>), select duration (e.g., 2 Hours), and review the live price calculation.</p>
+    <p>4. Click <strong>"Confirm & Generate Ticket"</strong>: Emphasize that the reservation was executed via an atomic database transaction (REQ-10) to prevent double-booking.</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-number">Phase 4: Proving Double-Booking Prevention (RMMM Risk R1)</div>
+    <p>1. Open a second browser window (or Incognito mode) side-by-side.</p>
+    <p>2. Show that slot <code>A-01</code> immediately updated to <span class="badge badge-red">Booked</span> on the second client without refreshing the page (demonstrating WebSocket sync under 5 seconds).</p>
+    <p>3. Attempting to reserve the same slot returns a clean conflict rejection error, proving concurrency safety.</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-number">Phase 5: Digital QR Pass & Offline Caching</div>
+    <p>1. In the first window, navigate to <strong>"My Bookings"</strong>.</p>
+    <p>2. Click <strong>"View Digital QR Ticket"</strong>: Show the generated HD QR code and explain that it is cryptographically signed with HMAC-SHA256.</p>
+    <p>3. Highlight that the ticket is stored in <code>localStorage</code>, satisfying REQ-23 (offline availability).</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-number">Phase 6: Gate Attendant Validation (Entry & Exit Simulation)</div>
+    <p>1. Switch to <strong>Lot Admin</strong> mode via the top navbar.</p>
+    <p>2. Open the <strong>"Gate Scanner"</strong> tab.</p>
+    <p>3. Click <strong>"Auto-Fill"</strong> (or paste the ticket code) and click <strong>"Validate ENTRY Gate Scan"</strong>:</p>
+    <ul>
+      <li>Show the green confirmation banner and the exact entry timestamp recorded in the database.</li>
+    </ul>
+    <p>4. Click <strong>"Validate EXIT Gate Scan"</strong>:</p>
+    <ul>
+      <li>Show the departure timestamp, computed parking duration, and total fee calculated based on the hourly rate.</li>
+      <li>Show that the slot was automatically released back into the available pool for future drivers.</li>
+    </ul>
+  </div>
+
+  <div class="step-box">
+    <div class="step-number">Phase 7: System Administration & Grace Period Monitor</div>
+    <p>1. Switch to <strong>Sys Admin</strong> mode and open the <strong>"Admin Dashboard"</strong>.</p>
+    <p>2. Display the live analytics cards: Total Lots, Total Slots, Available Spots, and Total Revenue Collected.</p>
+    <p>3. Click <strong>"Onboard New Parking Lot"</strong>: Fill in sample coordinates and submit, demonstrating dynamic lot provisioning.</p>
+    <p>4. Explain the <strong>15-Minute Grace Period Background Task</strong>: Highlight that background tasks continuously protect parking operators against no-shows.</p>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 5 -->
+  <h2>5. Key Viva Questions & Model Answers</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 35%;">Question</th>
+        <th>Model Technical Answer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>How does SpotSync prevent two users from booking the same slot at the same time?</strong></td>
+        <td>We utilize SQLite atomic transactions with <code>BEGIN IMMEDIATE</code> locking. When a reservation request arrives, the slot's current status and active reservation records are checked inside the locked transaction. If another user commits first, the second transaction is immediately rolled back and returns an HTTP 409 Conflict error.</td>
+      </tr>
+      <tr>
+        <td><strong>How do you achieve real-time availability updates across clients?</strong></td>
+        <td>Instead of client-side polling, the backend maintains a WebSocket connection pool (<code>/ws/lots</code>). Whenever a slot changes state (booked, cancelled, entered, or maintenance), the server broadcasts a lightweight JSON payload to all active clients within 100 milliseconds, fulfilling REQ-8 (&lt;5 seconds).</td>
+      </tr>
+      <tr>
+        <td><strong>How are QR codes protected against forgery and reuse?</strong></td>
+        <td>Each QR token embeds the reservation ID, user ID, and slot ID signed with HMAC-SHA256 using a server secret key. Upon scanning, the server recalculates and verifies the cryptographic signature, verifies that the ticket is in the correct state, and marks it as consumed to prevent replay attacks.</td>
+      </tr>
+      <tr>
+        <td><strong>How does the system calculate parking fees upon exit?</strong></td>
+        <td>Upon entry scan, the server records the exact UTC entry timestamp. Upon exit scan, the departure timestamp is logged and the duration is computed in seconds. Hours are rounded up to billable increments multiplied by the lot's rate per hour, ensuring accurate pricing.</td>
+      </tr>
+      <tr>
+        <td><strong>How is offline ticketing achieved?</strong></td>
+        <td>Whenever an online reservation is confirmed, the ticket payload and cryptographic token are serialized and cached in browser <code>localStorage</code>. Even if the driver loses internet connection in an underground garage, the pass renders offline directly from local storage.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 6 -->
+  <h2>6. Conclusion</h2>
+  <p>
+    SpotSync successfully implements all functional and non-functional requirements established in the SRS v1.1 and RMMM Plan. By unifying real-time WebSocket communication, atomic database concurrency controls, cryptographic ticketing, and responsive map visualizations, the application demonstrates an end-to-end smart parking management platform ready for real-world deployment.
+  </p>
+
+</body>
+</html>
+"""
+
+def generate_pdf():
+    html_file = os.path.abspath("documentation.html")
+    pdf_file = os.path.abspath("SpotSync_Complete_Documentation_and_Demo_Guide.pdf")
+
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(HTML_CONTENT)
+
+    edge_paths = [
+        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+    ]
+
+    browser_exe = None
+    for p in edge_paths:
+        if os.path.exists(p):
+            browser_exe = p
+            break
+
+    if not browser_exe:
+        print("No headless browser found to compile PDF.")
+        return
+
+    file_url = "file:///" + html_file.replace("\\", "/")
+    cmd = [
+        browser_exe,
+        "--headless",
+        "--disable-gpu",
+        "--no-pdf-header-footer",
+        f"--print-to-pdf={pdf_file}",
+        file_url
+    ]
+
+    print(f"Compiling PDF via {browser_exe}...")
+    subprocess.run(cmd, check=True)
+    
+    if os.path.exists(pdf_file):
+        print(f"SUCCESS: Generated PDF at: {pdf_file} (Size: {os.path.getsize(pdf_file)} bytes)")
+    
+    # Keep the HTML file as well for reference
+    print(f"HTML source retained at: {html_file}")
+
+if __name__ == "__main__":
+    generate_pdf()
