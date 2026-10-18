@@ -3,8 +3,9 @@
  * Version 1.1.0 (Full SRS & RMMM Specification Implementation)
  */
 
-const API_BASE = window.location.origin.includes('8000') 
-  ? window.location.origin 
+// Same-origin when served by the FastAPI backend (port 8000); otherwise (file://, other dev server) point at it.
+const API_BASE = window.location.protocol.startsWith('http') && window.location.port === '8000'
+  ? window.location.origin
   : 'http://localhost:8000';
 
 const WS_BASE = API_BASE.replace('http', 'ws');
@@ -65,19 +66,40 @@ class SpotSyncApp {
     this.renderAuthHeader();
     this.updateRoleUI();
 
-    // Default route
+    // Default route (the landing page deep-links to a lot with app.html#lot=<lot_id>)
     await this.fetchLots();
-    this.navigate('home');
+    const deepLot = new URLSearchParams(window.location.hash.slice(1)).get('lot');
+    if (deepLot) this.navigate('lotDetails', { lot_id: deepLot });
+    else this.navigate('home');
 
     // Re-initialize Lucide icons
     if (window.lucide) lucide.createIcons();
   }
 
   initClock() {
-    setInterval(() => {
+    const tick = () => {
       const el = document.getElementById('current-time-clock');
       if (el) el.innerText = new Date().toLocaleTimeString();
-    }, 1000);
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  // SQLite CURRENT_TIMESTAMP values are UTC without a zone marker; parse them as UTC.
+  parseServerTime(ts) {
+    if (!ts) return new Date(NaN);
+    return /[zZ]|[+-]\d\d:?\d\d$/.test(ts) ? new Date(ts) : new Date(ts.replace(' ', 'T') + 'Z');
+  }
+
+  setWsStatus(online) {
+    const banner = document.getElementById('ws-banner');
+    const text = document.getElementById('ws-text');
+    if (banner) banner.classList.toggle('offline', !online);
+    if (text) {
+      text.innerText = online
+        ? 'WebSocket connected — real-time availability propagation active (< 5s sync, REQ-8)'
+        : 'Real-time stream disconnected — retrying every 5 seconds…';
+    }
   }
 
   detectUserLocation() {
@@ -104,8 +126,7 @@ class SpotSyncApp {
       
       this.ws.onopen = () => {
         console.log('[WebSocket] Real-time availability connection established.');
-        const banner = document.getElementById('ws-banner');
-        if (banner) banner.classList.remove('bg-red-950/80', 'border-red-800/50');
+        this.setWsStatus(true);
       };
 
       this.ws.onmessage = (evt) => {
@@ -127,6 +148,7 @@ class SpotSyncApp {
 
       this.ws.onclose = () => {
         console.warn('[WebSocket] Connection closed. Retrying in 5 seconds...');
+        this.setWsStatus(false);
         setTimeout(() => this.setupWebSocket(), 5000);
       };
     } catch (e) {
@@ -272,6 +294,7 @@ class SpotSyncApp {
   // --- NAVIGATION ---
   navigate(view, params = {}) {
     this.currentView = view;
+    this.closeModal();
     const container = document.getElementById('app-container');
     if (!container) return;
 
@@ -383,7 +406,7 @@ class SpotSyncApp {
       <div class="py-2.5 px-1 hover:bg-slate-800/40 rounded-lg transition ${!n.is_read ? 'font-semibold text-white' : 'text-slate-400'}">
         <div class="flex items-center justify-between text-[11px] text-blue-400 mb-1">
           <span class="capitalize font-bold">${n.type}</span>
-          <span class="text-slate-500">${new Date(n.sent_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+          <span class="text-slate-500">${this.parseServerTime(n.sent_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
         </div>
         <p class="leading-snug">${n.message}</p>
       </div>
@@ -527,7 +550,7 @@ class SpotSyncApp {
     // Add User Current Location Marker
     L.circleMarker([this.userLocation.lat, this.userLocation.lng], {
       radius: 9,
-      fillColor: '#3b82f6',
+      fillColor: '#45CFFF',
       color: '#ffffff',
       weight: 3,
       opacity: 1,
@@ -920,7 +943,7 @@ class SpotSyncApp {
       const payload = {
         slot_id: this.selectedSlot.slot_id,
         lot_id: this.selectedLot.lot_id,
-        start_time: new Date(startTimeVal).isoformat ? new Date(startTimeVal).toISOString() : startTimeVal,
+        start_time: startTimeVal, // local wall-clock "YYYY-MM-DDTHH:MM", same clock the grace-period monitor uses
         duration_hours: durationVal
       };
 
@@ -1263,7 +1286,7 @@ class SpotSyncApp {
         [(startLat + destLat)/2 + 0.002, (startLng + destLng)/2 - 0.002],
         [destLat, destLng]
       ];
-      const polyline = L.polyline(latlngs, {color: '#3b82f6', weight: 5, opacity: 0.8}).addTo(navMap);
+      const polyline = L.polyline(latlngs, {color: '#45CFFF', weight: 4, opacity: 0.9}).addTo(navMap);
       navMap.fitBounds(polyline.getBounds(), {padding: [30, 30]});
     }, 100);
   }

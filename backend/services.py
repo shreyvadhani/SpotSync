@@ -95,7 +95,9 @@ def check_grace_period_expirations():
     conn = get_db()
     cursor = conn.cursor()
 
-    now = datetime.utcnow()
+    # Reservation times are stored as local wall-clock time (as entered in the
+    # booking form), so compare against local time, not UTC.
+    now = datetime.now()
     # Find active reservations where start_time + grace_period < now and status == 'active'
     cursor.execute("""
         SELECT r.reservation_id, r.user_id, r.slot_id, r.lot_id, r.start_time, p.name as lot_name

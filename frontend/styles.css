@@ -1,137 +1,122 @@
-/* SpotSync Ultra Modern Custom CSS */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
-body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #0f172a;
-  color: #f8fafc;
+/* SpotSync app theme — the landing page's design language (black, glass, cyan,
+   square corners, "+" registration marks, Manrope + JetBrains Mono). */
+:root {
+  --cyan: #45CFFF;
+  --green: #35D59A;
+  --amber: #F5A524;
+  --red: #FF6B6B;
+  --muted: rgba(255, 255, 255, .64);
+  --line: rgba(255, 255, 255, .1);
+  --glass: rgba(26, 26, 26, .55);
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
 }
+
+html { background: #000; }
+body {
+  font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  color: #fff;
+  background: radial-gradient(120% 70% at 70% 100%, #0B1930 0%, #07111F 40%, #000 100%) fixed, #000;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: rgba(69, 207, 255, .3); }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #1e293b;
-}
-::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d0d0d; }
+::-webkit-scrollbar-thumb { background: #3a3a3a; }
+::-webkit-scrollbar-thumb:hover { background: #55606a; }
+
+/* ---------- Flat, square design language (overrides the Tailwind utilities app.js emits) ---------- */
+[class*="rounded"]:not(.rounded-full) { border-radius: 0 !important; }
+.rounded-full[class*="px-"] { border-radius: 0 !important; }
+[class*="shadow-"] { box-shadow: none !important; }
+
+/* Primary buttons = the landing's white "solid object" */
+.bg-blue-600, .bg-emerald-600 { color: #000 !important; font-weight: 700; letter-spacing: .02em; }
+.bg-blue-600 [class*="text-"], .bg-emerald-600 [class*="text-"] { color: inherit !important; }
+.bg-blue-600:hover, .hover\:bg-blue-500:hover { background-color: var(--cyan) !important; }
+.bg-blue-600.text-white { color: #000 !important; }
+[class*="bg-blue-600/"], [class*="bg-emerald-500/80"] { color: #000 !important; }
+[class*="bg-blue-600/"] [class*="text-"] { color: inherit !important; }
+button:disabled { opacity: .45; }
+
+.mono-label, .tracking-wider, .tracking-widest, .uppercase {
+  font-family: var(--mono);
+  letter-spacing: .12em;
 }
 
-/* Glassmorphism Cards */
+/* Glass panels + registration marks */
 .glass-panel {
-  background: rgba(30, 41, 59, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: var(--glass);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  border: 1px solid var(--line);
 }
+.glass-panel:not(.sticky):not(.absolute):not(.fixed) { position: relative; }
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  pointer-events: none;
+  --mk: rgba(255, 255, 255, .55);
+  --g: linear-gradient(var(--mk), var(--mk));
+  background:
+    var(--g) 0 4px/9px 1px no-repeat, var(--g) 4px 0/1px 9px no-repeat,
+    var(--g) 100% 4px/9px 1px no-repeat, var(--g) calc(100% - 4px) 0/1px 9px no-repeat,
+    var(--g) 0 calc(100% - 4px)/9px 1px no-repeat, var(--g) 4px 100%/1px 9px no-repeat,
+    var(--g) 100% calc(100% - 4px)/9px 1px no-repeat, var(--g) calc(100% - 4px) 100%/1px 9px no-repeat;
+}
+.glass-panel.overflow-hidden::before, .toast-slide-in::before, #notif-dropdown::before { inset: 0; }
 
 .glass-nav {
-  background: rgba(15, 23, 42, 0.85);
+  background: linear-gradient(180deg, rgba(0, 0, 0, .85), rgba(0, 0, 0, .6));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--line);
 }
+.nav-link:hover { background: rgba(255, 255, 255, .06); }
 
-/* Map Custom Styling */
-.leaflet-container {
-  border-radius: 1rem;
-  z-index: 10 !important;
-  background: #0f172a !important;
-}
+.ws-banner { background: rgba(53, 213, 154, .06); border-bottom: 1px solid rgba(53, 213, 154, .25); color: var(--green); }
+.ws-banner.offline { background: rgba(255, 107, 107, .08); border-bottom-color: rgba(255, 107, 107, .3); color: var(--red); }
+.ws-banner.offline #ws-dot { background: var(--red); }
+.ss-ping { animation: ss-ping 2s cubic-bezier(.4, 0, .2, 1) infinite; }
+@keyframes ss-ping { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(2.2); opacity: 0; } }
+
+input, select, textarea { font-family: inherit; }
+input[type="datetime-local"] { color-scheme: dark; }
+input[type="range"], input[type="checkbox"] { accent-color: var(--cyan); }
+select option { background: #0d0d0d; color: #fff; }
+
+/* Map — dark-toned OSM tiles */
+.leaflet-container { z-index: 10 !important; background: #0a0a0a !important; font-family: inherit; }
+.leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.7); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { border-radius: 0 !important; }
 
 .custom-map-pin {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  color: white;
-  font-weight: 700;
-  font-size: 13px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
-  border: 2px solid white;
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 50%;
+  color: #000; font-weight: 800; font-size: 13px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, .12);
+  border: 2px solid #fff;
 }
-
-.pin-green { background: #10b981; }
-.pin-orange { background: #f59e0b; }
-.pin-red { background: #ef4444; }
-
-/* Pulsing Live Beacon */
-.pulse-beacon {
-  position: relative;
-}
-.pulse-beacon::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: 50%;
-  border: 2px solid #10b981;
-  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.3); opacity: 0; }
-  100% { transform: scale(0.95); opacity: 0; }
-}
+.pin-green { background: var(--green); }
+.pin-orange { background: var(--amber); }
+.pin-red { background: var(--red); }
 
 /* Slot Interactive Grid */
-.slot-card {
-  transition: all 0.2s ease-in-out;
-}
-.slot-card:hover {
-  transform: translateY(-3px);
-}
-
-.slot-available {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  color: #34d399;
-}
-.slot-available:hover {
-  background: rgba(16, 185, 129, 0.25);
-  border-color: #10b981;
-}
-
-.slot-booked {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #f87171;
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-.slot-maintenance {
-  background: rgba(107, 114, 128, 0.15);
-  border: 1px solid rgba(107, 114, 128, 0.3);
-  color: #9ca3af;
-  cursor: not-allowed;
-}
-
+.slot-card { transition: all .2s ease-in-out; }
+.slot-card:hover { transform: translateY(-3px); }
+.slot-available { background: rgba(53, 213, 154, .08); border: 1px solid rgba(53, 213, 154, .4); color: var(--green); }
+.slot-available:hover { background: rgba(53, 213, 154, .2); border-color: var(--green); }
+.slot-booked { background: rgba(255, 107, 107, .08); border: 1px solid rgba(255, 107, 107, .3); color: var(--red); cursor: not-allowed; opacity: .65; }
+.slot-maintenance { background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .18); color: #9a9a9a; cursor: not-allowed; }
 .slot-selected {
-  background: #3b82f6 !important;
-  border-color: #60a5fa !important;
-  color: white !important;
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+  background: var(--cyan) !important; border-color: #fff !important; color: #000 !important;
   transform: scale(1.05);
 }
+.slot-selected * { color: #000 !important; }
 
 /* Toast Animations */
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-.toast-slide-in {
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast-slide-in { animation: slideIn .3s cubic-bezier(.16, 1, .3, 1) forwards; }

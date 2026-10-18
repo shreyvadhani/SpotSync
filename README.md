@@ -9,7 +9,8 @@
 
 The project is currently running and accessible at:
 
-* **Interactive Web Application**: [http://localhost:8000/](http://localhost:8000/) or [http://localhost:8000/app/index.html](http://localhost:8000/app/index.html)
+* **Landing Page** (scroll-scrubbed hero video + live parking explorer): [http://localhost:8000/](http://localhost:8000/)
+* **Interactive Web Application**: [http://localhost:8000/app.html](http://localhost:8000/app.html) (the landing page's "Open App" / "View Bays & Reserve" buttons link here; `app.html#lot=<lot_id>` deep-links to a lot)
 * **Interactive OpenAPI / Swagger Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
 * **Real-Time WebSocket Stream**: `ws://localhost:8000/ws/lots`
 
@@ -93,12 +94,20 @@ SpotSync is fully self-contained using OpenStreetMap, Leaflet JS, and cryptograp
 
 ## 🏃 Rerunning the Project
 
-* **Via Windows Batch File**: Double-click `start.bat`.
+* **Via Windows Batch File**: Double-click `start.bat` (installs `backend/requirements.txt`, starts the server, opens the browser).
 * **Via Terminal**:
   ```bash
-  cd c:\Users\Administrator\Desktop\SpotSync\backend
+  cd backend
+  python -m pip install -r requirements.txt
   python app.py
   ```
+
+### Frontend layout (`frontend/`)
+| File | Purpose |
+|---|---|
+| `index.html`, `landing.css`, `landing.js` | Landing page, ported from the "SpotSync landing page animation" template; the Explore panel and hero card read live data from `/api/lots` + `/ws/lots` |
+| `app.html`, `app.js`, `styles.css` | The application (search, reserve, QR tickets, gate scanner, admin), themed to the same design language |
+| `assets/spotsync-hero.mp4` | Scroll-scrubbed hero video |
 * **Run Automated E2E Test Suite**:
   ```bash
   python test_e2e.py

@@ -207,7 +207,10 @@ def search_lots(
     cursor.execute("""
         SELECT p.*,
                COUNT(s.slot_id) as total_slots_count,
-               SUM(CASE WHEN s.status = 'available' THEN 1 ELSE 0 END) as available_slots_count
+               SUM(CASE WHEN s.status = 'available' THEN 1 ELSE 0 END) as available_slots_count,
+               SUM(CASE WHEN s.status = 'available' AND s.type = 'ev' THEN 1 ELSE 0 END) as ev_available,
+               SUM(CASE WHEN s.status = 'available' AND s.type = 'accessible' THEN 1 ELSE 0 END) as accessible_available,
+               SUM(CASE WHEN s.status = 'available' AND s.type = 'compact' THEN 1 ELSE 0 END) as compact_available
         FROM parking_lots p
         LEFT JOIN slots s ON p.lot_id = s.lot_id
         GROUP BY p.lot_id
@@ -501,7 +504,7 @@ async def validate_entry_ticket(data: ValidateQRSchema, user: dict = Depends(req
 
     conn = get_db()
     cursor = conn.cursor()
-    entry_now = datetime.utcnow().isoformat()
+    entry_now = datetime.now().isoformat()
 
     cursor.execute(
         "UPDATE tickets SET status = 'entered', entry_time = ? WHERE ticket_id = ?",
@@ -533,7 +536,7 @@ async def validate_exit_ticket(data: ValidateQRSchema, user: dict = Depends(requ
 
     conn = get_db()
     cursor = conn.cursor()
-    exit_now = datetime.utcnow().isoformat()
+    exit_now = datetime.now().isoformat()
 
     # Get lot rate per hour
     cursor.execute("""

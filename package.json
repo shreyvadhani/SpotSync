@@ -2,15 +2,10 @@
   "name": "spotsync",
   "version": "1.1.0",
   "private": true,
-  "description": "SpotSync - Real-Time Parking Discovery, Reservation & Ticketing Application",
+  "description": "SpotSync - Real-Time Parking Discovery, Reservation & Ticketing Application (FastAPI backend serving a static frontend)",
   "scripts": {
-    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "cd server && npm run dev",
-    "dev:client": "cd client && npm run dev",
-    "start": "cd server && npm start"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2"
+    "install:all": "cd backend && python -m pip install -r requirements.txt",
+    "start": "cd backend && python app.py",
+    "test": "python test_e2e.py"
   }
 }

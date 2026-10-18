@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="SpotSync — real-time smart parking discovery, reservation, navigation and contactless ticketing. Smarter Parking. Smoother Cities.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="_ds/industry-bfed8626-0427-438e-a271-2d73dfc8ce0d/styles.css">
+<script src="_ds/industry-bfed8626-0427-438e-a271-2d73dfc8ce0d/_ds_bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/ScrollTrigger.min.js"></script>
+<style>
+html{background:#000;scroll-behavior:smooth}
+html body{margin:0;background:#000;color:#fff;font-family:Manrope,ui-sans-serif,system-ui,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+html body h1,html body h2,html body h3,html body h4{font-family:Manrope,ui-sans-serif,system-ui,sans-serif}
+a{color:#45CFFF}
+a:hover{color:#fff}
+:focus-visible{outline:2px solid #45CFFF;outline-offset:3px}
+::selection{background:rgba(69,207,255,.3)}
+@keyframes ss-ping{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.4);opacity:0}}
+@keyframes ss-blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ss-arrow-out{from{transform:translateX(0)}to{transform:translateX(160%)}}
+@keyframes ss-arrow-in{from{transform:translateX(-160%)}to{transform:translateX(0)}}
+@keyframes ss-roll-out{from{transform:translateY(0)}to{transform:translateY(-110%)}}
+@keyframes ss-roll-in{from{transform:translateY(110%)}to{transform:translateY(0)}}
+@keyframes ss-scroll{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+[data-arrow]:hover [data-arrow-a]{animation:ss-arrow-out .45s cubic-bezier(.4,0,.2,1) forwards}
+[data-arrow]:hover [data-arrow-b]{animation:ss-arrow-in .45s cubic-bezier(.4,0,.2,1) forwards}
+[data-roll]:hover [data-roll-a]{animation:ss-roll-out .4s cubic-bezier(.4,0,.2,1) forwards}
+[data-roll]:hover [data-roll-b]{animation:ss-roll-in .4s cubic-bezier(.4,0,.2,1) forwards}
+@media (prefers-reduced-motion:reduce){[data-arrow]:hover [data-arrow-a],[data-arrow]:hover [data-arrow-b],[data-roll]:hover [data-roll-a],[data-roll]:hover [data-roll-b]{animation:none}html{scroll-behavior:auto}}
+</style>
+</helmet>
+
+<div style="position:relative;min-height:100vh;background:#000;color:#fff;font-family:Manrope,ui-sans-serif,system-ui,sans-serif">
+
+<!-- FIXED VIDEO LAYER -->
+<div data-screen-label="Video background" style="position:fixed;inset:0;z-index:0;background:#000;overflow:hidden">
+  <div data-fallback style="position:absolute;inset:0;opacity:0;transition:opacity 1s cubic-bezier(.4,0,.2,1);background:radial-gradient(120% 70% at 70% 100%,#0B1930 0%,#07111F 52%,#000 100%)"></div>
+  <video data-video muted="" preload="auto" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.4s cubic-bezier(.4,0,.2,1);pointer-events:none"></video>
+  <div data-overlay style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.42) 46%,rgba(0,0,0,.1) 100%)"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,rgba(0,0,0,0) 20%,rgba(0,0,0,0) 62%,rgba(0,0,0,.55) 100%)"></div>
+</div>
+
+<!-- HEADER -->
+<header data-header style="position:fixed;top:0;left:0;right:0;z-index:60;height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 5vw;background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0))">
+  <a href="#home" aria-label="SpotSync home" style="display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none">
+    <span style="position:relative;display:block;width:26px;height:30px">
+      <span style="position:absolute;left:8px;top:9px;width:10px;height:10px;border-radius:50%;background:#45CFFF;opacity:.5;animation:ss-ping 2.4s cubic-bezier(.4,0,.2,1) infinite"></span>
+      <svg width="26" height="30" viewBox="0 0 26 30" fill="none" style="position:absolute;inset:0"><path d="M13 28S3 19.6 3 11.5a10 10 0 0 1 20 0C23 19.6 13 28 13 28Z" stroke="#45CFFF" stroke-width="1.75" stroke-linejoin="round"></path><circle cx="13" cy="11.5" r="3.4" fill="#45CFFF"></circle></svg>
+    </span>
+    <span style="font-weight:800;font-size:22px;letter-spacing:-.04em;line-height:1">Spot<span style="color:#45CFFF">Sync</span></span>
+  </a>
+  <div style="display:flex;align-items:center;gap:clamp(18px,2.6vw,44px)">
+    <sc-if value="{{ showLinks }}" hint-placeholder-val="{{ true }}">
+      <nav style="display:flex;align-items:center;gap:clamp(18px,2.6vw,44px)">
+        <a href="#home" data-nav="home" data-roll style="position:relative;display:block;overflow:hidden;height:20px;line-height:20px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.64);text-decoration:none;white-space:nowrap"><span data-roll-a style="display:block">Home</span><span data-roll-b style="position:absolute;left:0;top:0;display:block;color:#fff;transform:translateY(110%)">Home</span><i data-nav-dot style="position:absolute;left:0;right:0;bottom:0;height:1px;background:#45CFFF;opacity:0;transition:opacity .4s"></i></a>
+        <a href="#explore" data-nav="explore" data-roll style="position:relative;display:block;overflow:hidden;height:20px;line-height:20px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.64);text-decoration:none;white-space:nowrap"><span data-roll-a style="display:block">Explore Parking</span><span data-roll-b style="position:absolute;left:0;top:0;display:block;color:#fff;transform:translateY(110%)">Explore Parking</span><i data-nav-dot style="position:absolute;left:0;right:0;bottom:0;height:1px;background:#45CFFF;opacity:0;transition:opacity .4s"></i></a>
+        <a href="#how" data-nav="how" data-roll style="position:relative;display:block;overflow:hidden;height:20px;line-height:20px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.64);text-decoration:none;white-space:nowrap"><span data-roll-a style="display:block">How It Works</span><span data-roll-b style="position:absolute;left:0;top:0;display:block;color:#fff;transform:translateY(110%)">How It Works</span><i data-nav-dot style="position:absolute;left:0;right:0;bottom:0;height:1px;background:#45CFFF;opacity:0;transition:opacity .4s"></i></a>
+        <a href="#features" data-nav="features" data-roll style="position:relative;display:block;overflow:hidden;height:20px;line-height:20px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.64);text-decoration:none;white-space:nowrap"><span data-roll-a style="display:block">Features</span><span data-roll-b style="position:absolute;left:0;top:0;display:block;color:#fff;transform:translateY(110%)">Features</span><i data-nav-dot style="position:absolute;left:0;right:0;bottom:0;height:1px;background:#45CFFF;opacity:0;transition:opacity .4s"></i></a>
+        <a href="#about" data-nav="about" data-roll style="position:relative;display:block;overflow:hidden;height:20px;line-height:20px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.64);text-decoration:none;white-space:nowrap"><span data-roll-a style="display:block">About</span><span data-roll-b style="position:absolute;left:0;top:0;display:block;color:#fff;transform:translateY(110%)">About</span><i data-nav-dot style="position:absolute;left:0;right:0;bottom:0;height:1px;background:#45CFFF;opacity:0;transition:opacity .4s"></i></a>
+      </nav>
+    </sc-if>
+    <a href="#explore" data-arrow style="position:relative;display:inline-flex;align-items:center;gap:12px;height:44px;padding:0 18px 0 20px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.12em;text-decoration:none;white-space:nowrap">
+      <i data-marks="rgba(255,255,255,.85)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+      <span>FIND PARKING</span>
+      <span style="position:relative;display:block;width:16px;height:16px;overflow:hidden"><svg data-arrow-a width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><svg data-arrow-b width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0;transform:translateX(-160%)"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+    </a>
+    <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ toggleMenu }}" aria-label="Menu" style="appearance:none;display:grid;place-items:center;width:44px;height:44px;padding:0;background:rgba(26,26,26,.4);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path></svg>
+      </button>
+    </sc-if>
+  </div>
+</header>
+
+<sc-if value="{{ showMenu }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;top:76px;left:0;right:0;z-index:55;padding:12px 5vw 28px;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column">
+    <a href="#home" onClick="{{ closeMenu }}" style="padding:16px 0;border-bottom:1px solid rgba(255,255,255,.1);color:#fff;text-decoration:none;font-weight:700;font-size:26px;letter-spacing:-.03em">Home</a>
+    <a href="#explore" onClick="{{ closeMenu }}" style="padding:16px 0;border-bottom:1px solid rgba(255,255,255,.1);color:#fff;text-decoration:none;font-weight:700;font-size:26px;letter-spacing:-.03em">Explore Parking</a>
+    <a href="#how" onClick="{{ closeMenu }}" style="padding:16px 0;border-bottom:1px solid rgba(255,255,255,.1);color:#fff;text-decoration:none;font-weight:700;font-size:26px;letter-spacing:-.03em">How It Works</a>
+    <a href="#features" onClick="{{ closeMenu }}" style="padding:16px 0;border-bottom:1px solid rgba(255,255,255,.1);color:#fff;text-decoration:none;font-weight:700;font-size:26px;letter-spacing:-.03em">Features</a>
+    <a href="#about" onClick="{{ closeMenu }}" style="padding:16px 0;color:#fff;text-decoration:none;font-weight:700;font-size:26px;letter-spacing:-.03em">About</a>
+  </div>
+</sc-if>
+
+<!-- SCRUB READOUT -->
+<div data-hud style="position:fixed;right:5vw;bottom:22px;z-index:40;display:flex;align-items:center;gap:14px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.72);text-shadow:0 1px 8px rgba(0,0,0,.8);pointer-events:none">
+  <span data-hud-label>SYNC 00.00s</span>
+  <span style="position:relative;display:block;width:96px;height:1px;background:rgba(255,255,255,.25)"><i data-hud-bar style="position:absolute;left:0;top:0;width:100%;height:1px;background:#45CFFF;transform-origin:0 50%;transform:scaleX(0)"></i></span>
+  <span data-hud-pct>000%</span>
+</div>
+
+<main style="position:relative;z-index:2">
+
+<!-- 01 HERO -->
+<section id="home" data-screen-label="01 Hero" style="position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:flex-end;padding:132px 0 11vh">
+  <div data-hero style="width:min(90vw,1320px);margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:48px">
+    <div style="flex:1 1 560px;max-width:900px">
+      <div data-hero-in style="display:flex;align-items:center;gap:14px;margin-bottom:28px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#45CFFF"><span style="flex:none;width:28px;height:1px;background:#45CFFF"></span>Real-time parking · Reserve · Contactless</div>
+      <h1 style="margin:0 0 32px;font-family:Manrope,sans-serif;font-weight:800;font-size:clamp(44px,7.6vw,124px);line-height:.95;letter-spacing:-.045em;color:#fff">
+        <span style="display:block;overflow:hidden;padding-bottom:.08em"><span data-line style="display:block">Smarter Parking.</span></span>
+        <span style="display:block;overflow:hidden;padding-bottom:.08em"><span data-line style="display:block">Smoother Cities<span style="color:#45CFFF">.</span></span></span>
+      </h1>
+      <p data-hero-in style="margin:0 0 14px;font-size:clamp(19px,1.9vw,26px);font-weight:600;letter-spacing:-.02em;line-height:1.3;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.5)">Find parking. Reserve your spot. Get there effortlessly.</p>
+      <p data-hero-in style="margin:0 0 36px;max-width:56ch;font-size:16px;line-height:1.6;color:rgba(255,255,255,.64);text-shadow:0 2px 20px rgba(0,0,0,.6);text-wrap:pretty">Discover available parking in real time, reserve a space in advance, navigate directly to the destination, and enter or exit with a digital pass.</p>
+      <div data-hero-in style="display:flex;flex-wrap:wrap;align-items:center;gap:16px">
+        <a href="#explore" data-arrow style="position:relative;display:inline-flex;align-items:center;gap:14px;height:52px;padding:0 22px 0 26px;background:#fff;color:#000;font-weight:700;font-size:13px;letter-spacing:.12em;text-decoration:none;white-space:nowrap">
+          <i data-marks="rgba(255,255,255,.85)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+          <span>FIND PARKING</span>
+          <span style="position:relative;display:block;width:18px;height:18px;overflow:hidden"><svg data-arrow-a width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><svg data-arrow-b width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0;transform:translateX(-160%)"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+        </a>
+        <a href="#how" style="display:inline-flex;align-items:center;gap:12px;height:52px;padding:0 24px;color:#fff;text-decoration:none;font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.25);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)" style-hover="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.6);color:#fff">How it works<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg></a>
+      </div>
+    </div>
+    <div data-par="-10" style="flex:0 0 300px;max-width:100%">
+      <div data-hero-in style="position:relative;padding:22px;background:rgba(26,26,26,.4);backdrop-filter:blur(18px) saturate(1.25);-webkit-backdrop-filter:blur(18px) saturate(1.25);border:1px solid rgba(255,255,255,.1)">
+        <i data-marks="rgba(255,255,255,.7)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.64)">
+          <span>Nearest · Live</span>
+          <span style="position:relative;display:block;width:8px;height:8px"><i style="position:absolute;inset:0;border-radius:50%;background:#35D59A;opacity:.6;animation:ss-ping 2s cubic-bezier(.4,0,.2,1) infinite"></i><i style="position:absolute;inset:0;border-radius:50%;background:#35D59A"></i></span>
+        </div>
+        <div style="margin:18px 0 4px;font-size:22px;font-weight:700;letter-spacing:-.025em;line-height:1.15">Harbor Deck — P2</div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-family:'JetBrains Mono',ui-monospace,monospace">
+          <span style="font-size:12px;letter-spacing:.1em;color:rgba(255,255,255,.64)">140 M · 2 MIN</span>
+          <span style="font-size:13px;color:#35D59A"><b style="font-size:26px;font-weight:600;letter-spacing:-.02em">{{ heroOpen }}</b> open</span>
+        </div>
+        <div style="margin-top:16px;height:2px;background:rgba(255,255,255,.14)"><i style="display:block;height:2px;background:#35D59A;transition:width 1s cubic-bezier(.4,0,.2,1);width:{{ heroFill }}%"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 HOW IT WORKS -->
+<section data-screen-label="02 How it works" style="position:relative;padding:20vh 0 16vh">
+  <div style="width:min(90vw,1320px);margin:0 auto">
+    <div id="how" style="max-width:760px;scroll-margin-top:110px">
+      <div data-rv style="display:flex;align-items:center;gap:14px;margin-bottom:26px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#45CFFF"><span style="flex:none;width:28px;height:1px;background:#45CFFF"></span>02 / How it works</div>
+      <h2 data-rv style="margin:0 0 24px;font-weight:800;font-size:clamp(38px,5.6vw,88px);line-height:.98;letter-spacing:-.04em;text-wrap:balance">Four moves.<br>Zero circling.</h2>
+      <p data-rv style="margin:0;max-width:48ch;font-size:18px;line-height:1.6;color:rgba(255,255,255,.64);text-wrap:pretty">From search to the barrier in one flow. SpotSync stays in sync with the street so you don't have to.</p>
+    </div>
+    <div style="width:min(100%,840px);margin-top:64px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+      <div data-rv style="position:relative;display:flex;flex-direction:column;min-height:272px;padding:26px;background:rgba(26,26,26,.4);backdrop-filter:blur(18px) saturate(1.25);-webkit-backdrop-filter:blur(18px) saturate(1.25);border:1px solid rgba(255,255,255,.1)">
+        <i data-bar style="position:absolute;left:-1px;right:-1px;top:-1px;height:1px;background:#45CFFF"></i>
+        <i data-marks="rgba(255,255,255,.7)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between"><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.16em;color:#45CFFF">01</span><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
+        <div style="flex:1;min-height:40px"></div>
+        <h3 style="margin:0 0 10px;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1">Discover</h3>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.64);text-wrap:pretty">Open bays near your destination, updated the moment a car leaves.</p>
+        <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#35D59A">Live availability</div>
+      </div>
+      <div data-rv style="position:relative;display:flex;flex-direction:column;min-height:272px;padding:26px;background:rgba(26,26,26,.4);backdrop-filter:blur(18px) saturate(1.25);-webkit-backdrop-filter:blur(18px) saturate(1.25);border:1px solid rgba(255,255,255,.1)">
+        <i data-bar style="position:absolute;left:-1px;right:-1px;top:-1px;height:1px;background:#45CFFF"></i>
+        <i data-marks="rgba(255,255,255,.7)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between"><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.16em;color:#45CFFF">02</span><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="m9 16 2 2 4-4"></path></svg></div>
+        <div style="flex:1;min-height:40px"></div>
+        <h3 style="margin:0 0 10px;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1">Reserve</h3>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.64);text-wrap:pretty">Hold a space before you set off. It stays yours until you arrive.</p>
+        <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#35D59A">Advance booking</div>
+      </div>
+      <div data-rv style="position:relative;display:flex;flex-direction:column;min-height:272px;padding:26px;background:rgba(26,26,26,.4);backdrop-filter:blur(18px) saturate(1.25);-webkit-backdrop-filter:blur(18px) saturate(1.25);border:1px solid rgba(255,255,255,.1)">
+        <i data-bar style="position:absolute;left:-1px;right:-1px;top:-1px;height:1px;background:#45CFFF"></i>
+        <i data-marks="rgba(255,255,255,.7)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between"><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.16em;color:#45CFFF">03</span><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg></div>
+        <div style="flex:1;min-height:40px"></div>
+        <h3 style="margin:0 0 10px;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1">Navigate</h3>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.64);text-wrap:pretty">Follow the cyan route straight to the bay. No circling, no guessing.</p>
+        <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#45CFFF">Direct navigation</div>
+      </div>
+      <div data-rv style="position:relative;display:flex;flex-direction:column;min-height:272px;padding:26px;background:rgba(26,26,26,.4);backdrop-filter:blur(18px) saturate(1.25);-webkit-backdrop-filter:blur(18px) saturate(1.25);border:1px solid rgba(255,255,255,.1)">
+        <i data-bar style="position:absolute;left:-1px;right:-1px;top:-1px;height:1px;background:#45CFFF"></i>
+        <i data-marks="rgba(255,255,255,.7)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between"><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.16em;color:#45CFFF">04</span><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"></rect><rect width="5" height="5" x="16" y="3" rx="1"></rect><rect width="5" height="5" x="3" y="16" rx="1"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path></svg></div>
+        <div style="flex:1;min-height:40px"></div>
+        <h3 style="margin:0 0 10px;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1">Enter</h3>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.64);text-wrap:pretty">Scan your digital pass at the gate. The same pass opens the way out.</p>
+        <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#35D59A">Contactless pass</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 FEATURES + EXPLORE -->
+<section data-screen-label="03 Features" style="position:relative;padding:12vh 0 18vh">
+  <div style="width:min(90vw,1320px);margin:0 auto">
+    <div style="width:min(100%,680px)">
+      <div id="features" style="scroll-margin-top:110px">
+        <div data-rv style="display:flex;align-items:center;gap:14px;margin-bottom:26px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#45CFFF"><span style="flex:none;width:28px;height:1px;background:#45CFFF"></span>03 / Features</div>
+        <h2 data-rv style="margin:0 0 64px;font-weight:800;font-size:clamp(38px,5.6vw,88px);line-height:1;letter-spacing:-.04em;text-wrap:balance">Everything between you and the bay.</h2>
+      </div>
+
+      <div style="border-top:1px solid rgba(255,255,255,.18)">
+        <div data-rv style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:start;gap:22px;padding:28px 0;border-bottom:1px solid rgba(255,255,255,.18)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path><circle cx="12" cy="12" r="2"></circle></svg>
+          <div><h3 style="margin:0 0 6px;font-size:22px;font-weight:700;letter-spacing:-.025em">Bay-level availability</h3><p style="margin:0;font-size:15px;line-height:1.55;color:rgba(255,255,255,.64);text-wrap:pretty">See free spaces by level, not just by garage, refreshed in real time.</p></div>
+          <span style="padding-top:6px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;color:#35D59A;white-space:nowrap">LIVE</span>
+        </div>
+        <div data-rv style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:start;gap:22px;padding:28px 0;border-bottom:1px solid rgba(255,255,255,.18)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg>
+          <div><h3 style="margin:0 0 6px;font-size:22px;font-weight:700;letter-spacing:-.025em">Filters that fit your car</h3><p style="margin:0;font-size:15px;line-height:1.55;color:rgba(255,255,255,.64);text-wrap:pretty">EV charging, accessible and covered bays, filtered before you arrive.</p></div>
+          <span style="padding-top:6px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.64);white-space:nowrap">EV · ACC · COV</span>
+        </div>
+        <div data-rv style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:start;gap:22px;padding:28px 0;border-bottom:1px solid rgba(255,255,255,.18)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+          <div><h3 style="margin:0 0 6px;font-size:22px;font-weight:700;letter-spacing:-.025em">Reserve in one tap</h3><p style="margin:0;font-size:15px;line-height:1.55;color:rgba(255,255,255,.64);text-wrap:pretty">Book for the time you'll arrive. Your space is held, not hoped for.</p></div>
+          <span style="padding-top:6px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;color:#35D59A;white-space:nowrap">HELD</span>
+        </div>
+        <div data-rv style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:start;gap:22px;padding:28px 0;border-bottom:1px solid rgba(255,255,255,.18)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"></rect><rect width="5" height="5" x="16" y="3" rx="1"></rect><rect width="5" height="5" x="3" y="16" rx="1"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path></svg>
+          <div><h3 style="margin:0 0 6px;font-size:22px;font-weight:700;letter-spacing:-.025em">Entry and exit, no ticket</h3><p style="margin:0;font-size:15px;line-height:1.55;color:rgba(255,255,255,.64);text-wrap:pretty">A digital pass opens the gate in and lets you out. No machines, no queues.</p></div>
+          <span style="padding-top:6px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;color:#45CFFF;white-space:nowrap">QR PASS</span>
+        </div>
+      </div>
+
+      <!-- EXPLORE PARKING (interactive) -->
+      <div id="explore" style="margin-top:18vh;scroll-margin-top:110px">
+        <div data-rv style="display:flex;align-items:center;gap:14px;margin-bottom:22px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#45CFFF"><span style="flex:none;width:28px;height:1px;background:#45CFFF"></span>Explore parking · Try it</div>
+        <div data-rv style="position:relative;padding:24px;background:rgba(26,26,26,.4);backdrop-filter:blur(22px) saturate(1.25);-webkit-backdrop-filter:blur(22px) saturate(1.25);border:1px solid rgba(255,255,255,.1)">
+          <i data-marks="rgba(255,255,255,.7)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.64)">
+            <span>Nearby · Sorted by distance</span>
+            <span style="display:inline-flex;align-items:center;gap:8px;color:#35D59A"><i style="display:block;width:7px;height:7px;border-radius:50%;background:#35D59A;animation:ss-blink 1.6s ease-in-out infinite"></i>Live</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+            <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
+              <button onClick="{{ c.onClick }}" style="appearance:none;height:34px;padding:0 14px;cursor:pointer;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:{{ c.bg }};color:{{ c.color }};border:1px solid {{ c.bc }}" style-hover="border-color:rgba(255,255,255,.55)">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+              <button onClick="{{ r.onSelect }}" style="appearance:none;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 16px;width:100%;padding:14px 16px;cursor:pointer;text-align:left;color:#fff;font-family:Manrope,sans-serif;background:{{ r.bg }};border:1px solid {{ r.bc }};transition:background .3s cubic-bezier(.4,0,.2,1),border-color .3s cubic-bezier(.4,0,.2,1)" style-hover="background:rgba(255,255,255,.07)">
+                <span style="font-size:17px;font-weight:700;letter-spacing:-.02em">{{ r.name }}</span>
+                <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:{{ r.openColor }}">{{ r.openText }}</span>
+                <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.64)">{{ r.meta }}</span>
+                <span style="display:block;width:96px;height:2px;background:rgba(255,255,255,.14)"><i style="display:block;height:2px;background:#35D59A;transition:width 1s cubic-bezier(.4,0,.2,1);width:{{ r.fill }}%"></i></span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:22px 0;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.1em;color:rgba(255,255,255,.64)">NO GARAGES MATCH THIS FILTER</div>
+          </sc-if>
+
+          <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.14)">
+              <sc-if value="{{ isIdle }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
+                  <div>
+                    <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.64);margin-bottom:6px">{{ selLevel }}</div>
+                    <div style="font-size:20px;font-weight:700;letter-spacing:-.025em">{{ selName }}</div>
+                    <div style="margin-top:4px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.08em;color:#45CFFF">ARRIVE BY {{ selEta }}</div>
+                  </div>
+                  <button onClick="{{ reserve }}" disabled="{{ reserveDisabled }}" data-arrow style="appearance:none;position:relative;display:inline-flex;align-items:center;gap:14px;height:48px;padding:0 20px 0 24px;border:0;cursor:pointer;background:#fff;color:#000;font-family:Manrope,sans-serif;font-weight:700;font-size:12px;letter-spacing:.12em;opacity:{{ reserveOpacity }}">
+                    <span>{{ reserveLabel }}</span>
+                    <span style="position:relative;display:block;width:16px;height:16px;overflow:hidden"><svg data-arrow-a width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><svg data-arrow-b width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0;transform:translateX(-160%)"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+                  </button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ isBooking }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:14px;min-height:62px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.16em;color:#45CFFF"><i style="display:block;width:8px;height:8px;border-radius:50%;background:#45CFFF;animation:ss-blink .7s ease-in-out infinite"></i>HOLDING YOUR SPACE…</div>
+              </sc-if>
+              <sc-if value="{{ isBooked }}" hint-placeholder-val="{{ false }}">
+                <div style="position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:18px;background:rgba(53,213,154,.08);border:1px solid rgba(53,213,154,.5)">
+                  <div style="display:flex;align-items:flex-start;gap:14px">
+                    <span style="display:grid;place-items:center;flex:none;width:36px;height:36px;border:1px solid #35D59A;color:#35D59A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span>
+                    <div>
+                      <div style="font-size:20px;font-weight:700;letter-spacing:-.025em;color:#35D59A">Booked</div>
+                      <div style="margin-top:2px;font-size:15px;color:#fff">{{ selName }} · {{ selLevel }}</div>
+                      <div style="margin-top:6px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.08em;color:rgba(255,255,255,.72)"><span style="white-space:nowrap">PASS {{ passCode }}</span> · <span style="white-space:nowrap">HELD UNTIL {{ holdUntil }}</span></div>
+                      <button onClick="{{ resetBooking }}" style="appearance:none;margin-top:18px;padding:0;border:0;background:none;cursor:pointer;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.64);text-decoration:underline;text-underline-offset:4px" style-hover="color:#fff">Cancel booking</button>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,8px);gap:2px;padding:8px;background:#fff">
+                    <sc-for list="{{ passCells }}" as="p" hint-placeholder-count="49"><i style="display:block;width:8px;height:8px;background:{{ p.bg }}"></i></sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ABOUT / FOOTER -->
+<footer id="about" data-screen-label="04 About" style="position:relative;z-index:2;min-height:88vh;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:14vh 0 0;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.72) 38%,rgba(0,0,0,.9) 100%)">
+  <div style="width:min(90vw,1320px);margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:56px">
+    <div style="flex:1 1 480px;max-width:760px">
+      <div data-rv style="display:flex;align-items:center;gap:14px;margin-bottom:26px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#45CFFF"><span style="flex:none;width:28px;height:1px;background:#45CFFF"></span>About</div>
+      <p data-rv style="margin:0 0 36px;font-size:clamp(26px,3.3vw,48px);font-weight:700;line-height:1.12;letter-spacing:-.035em;text-wrap:balance">SpotSync links drivers, garages and cities in real time. Less circling, calmer streets, faster arrivals.</p>
+      <a data-rv href="#explore" data-arrow style="position:relative;display:inline-flex;align-items:center;gap:14px;height:52px;padding:0 22px 0 26px;background:#fff;color:#000;font-weight:700;font-size:13px;letter-spacing:.12em;text-decoration:none;white-space:nowrap">
+        <i data-marks="rgba(255,255,255,.85)" style="position:absolute;inset:-5px;pointer-events:none"></i>
+        <span>FIND PARKING</span>
+        <span style="position:relative;display:block;width:18px;height:18px;overflow:hidden"><svg data-arrow-a width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><svg data-arrow-b width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0;transform:translateX(-160%)"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+      </a>
+    </div>
+    <div data-rv style="display:flex;flex-direction:column;gap:14px;min-width:180px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase">
+      <a href="#home" style="color:rgba(255,255,255,.64);text-decoration:none" style-hover="color:#45CFFF">Home</a>
+      <a href="#explore" style="color:rgba(255,255,255,.64);text-decoration:none" style-hover="color:#45CFFF">Explore Parking</a>
+      <a href="#how" style="color:rgba(255,255,255,.64);text-decoration:none" style-hover="color:#45CFFF">How It Works</a>
+      <a href="#features" style="color:rgba(255,255,255,.64);text-decoration:none" style-hover="color:#45CFFF">Features</a>
+    </div>
+  </div>
+  <div>
+    <div aria-hidden="true" style="margin:6vh 0 0 4.5vw;font-weight:800;font-size:clamp(76px,21vw,340px);line-height:.78;padding-bottom:.16em;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.22);white-space:nowrap;user-select:none">SpotSync</div>
+    <div style="width:min(90vw,1320px);margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:22px 0 26px;border-top:1px solid rgba(255,255,255,.14);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.64)">
+      <span>© 2026 SpotSync</span><span>Smarter Parking. Smoother Cities.</span>
+    </div>
+  </div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;scrubSmoothing&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.14,&quot;min&quot;:0.04,&quot;max&quot;:0.4,&quot;step&quot;:0.01,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scroll video&quot;},&quot;overlayStrength&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.85,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scroll video&quot;},&quot;showScrubReadout&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scroll video&quot;}}">
+class Component extends DCLogic {
+  VIDEO_URL = "videos/spotsync-hero.mp4";
+  VIDEO_END = 3.85;
+  REDUCED_FRAME = 1.8;
+
+  state = {
+    narrow: false, menu: false, filter: 'all', sel: 0, phase: 'idle', booked: null,
+    garages: [
+      { id: 0, name: 'Harbor Deck', code: 'P2', dist: 140, min: 2, open: 14, cap: 220, tags: ['ev', 'cov'], level: 'Level 2 · Bay B-14', bay: 'B-14' },
+      { id: 1, name: 'Market Street Garage', code: 'P1', dist: 320, min: 4, open: 41, cap: 410, tags: ['acc', 'cov'], level: 'Level 3 · Bay C-07', bay: 'C-07' },
+      { id: 2, name: 'Riverside Lot C', code: 'C', dist: 480, min: 6, open: 6, cap: 90, tags: ['ev'], level: 'Ground · Bay A-02', bay: 'A-02' },
+      { id: 3, name: 'Central Tower', code: 'P1', dist: 650, min: 8, open: 88, cap: 600, tags: ['ev', 'acc', 'cov'], level: 'Level 5 · Bay E-31', bay: 'E-31' }
+    ]
+  };
+
+  componentDidMount() {
+    this._timers = []; this._cur = 0; this._target = 0; this._max = 1; this._raf = 0;
+    this._ready = false; this._failed = false; this._stalled = false; this._act = null; this._smooth = 0.14;
+    this._reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.applyProps(); this.drawMarks(); this.initMedia(); this.initVideo(); this.initScroll(); this.initMotionWhenReady();
+    this._ticker = setInterval(() => this.liveTick(), 3200);
+  }
+
+  componentDidUpdate() { this.applyProps(); }
+
+  componentWillUnmount() {
+    const v = this._v;
+    if (this._raf) cancelAnimationFrame(this._raf);
+    clearInterval(this._ticker);
+    (this._timers || []).forEach(t => clearTimeout(t));
+    window.removeEventListener('scroll', this._onScroll, true);
+    window.removeEventListener('resize', this._onResize);
+    window.removeEventListener('pointerdown', this._prime, true);
+    window.removeEventListener('touchstart', this._prime, true);
+    if (this._ro) this._ro.disconnect();
+    if (this._mq) this._mq.removeEventListener('change', this._onMq);
+    if (v && this._vl) Object.keys(this._vl).forEach(k => v.removeEventListener(k, this._vl[k]));
+    if (this._ctx) { this._ctx.revert(); this._ctx = null; }
+  }
+
+  clamp(x, a, b) { return Math.min(b, Math.max(a, x)); }
+
+  applyProps() {
+    const p = this.props || {};
+    this._smooth = this.clamp(p.scrubSmoothing ?? 0.14, 0.03, 0.6);
+    const ov = document.querySelector('[data-overlay]'); if (ov) ov.style.opacity = String(p.overlayStrength ?? 0.85);
+    const h = document.querySelector('[data-hud]'); if (h) h.style.display = (p.showScrubReadout ?? true) ? 'flex' : 'none';
+  }
+
+  drawMarks() {
+    const g = c => 'linear-gradient(' + c + ',' + c + ')';
+    document.querySelectorAll('[data-marks]').forEach(el => {
+      const c = el.getAttribute('data-marks') || 'rgba(255,255,255,.7)', L = g(c);
+      el.style.background = [
+        L + ' 0 4px/9px 1px no-repeat', L + ' 4px 0/1px 9px no-repeat',
+        L + ' 100% 4px/9px 1px no-repeat', L + ' calc(100% - 4px) 0/1px 9px no-repeat',
+        L + ' 0 calc(100% - 4px)/9px 1px no-repeat', L + ' 4px 100%/1px 9px no-repeat',
+        L + ' 100% calc(100% - 4px)/9px 1px no-repeat', L + ' calc(100% - 4px) 100%/1px 9px no-repeat'
+      ].join(',');
+    });
+  }
+
+  initMedia() {
+    this._mq = window.matchMedia('(max-width: 900px)');
+    this._onMq = () => this.setState({ narrow: this._mq.matches, menu: false });
+    this._mq.addEventListener('change', this._onMq);
+    this.setState({ narrow: this._mq.matches });
+  }
+
+  /* ---------- scroll-driven video ---------- */
+  initVideo() {
+    const v = document.querySelector('[data-video]'), fb = document.querySelector('[data-fallback]');
+    if (!v) return;
+    this._v = v;
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = false; v.preload = 'auto';
+    v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', ''); v.removeAttribute('autoplay');
+    const reveal = () => { v.style.opacity = '1'; };
+    const meta = () => {
+      const d = v.duration;
+      if (isFinite(d) && d > 0) {
+        this._dur = d; this._end = Math.min(this.VIDEO_END, Math.max(0, d - 0.05)); this._ready = true;
+        if (this._reduce) { try { v.currentTime = Math.min(this.REDUCED_FRAME, this._end); } catch (e) {} }
+        this.kick();
+      }
+    };
+    const fail = () => { this._failed = true; v.style.opacity = '0'; if (fb) fb.style.opacity = '1'; };
+    this._vl = {
+      loadedmetadata: meta,
+      loadeddata: () => { meta(); reveal(); },
+      canplay: () => { meta(); reveal(); },
+      seeked: () => { this._seekAt = 0; this.kick(); },
+      error: fail,
+      stalled: () => {}
+    };
+    Object.keys(this._vl).forEach(k => v.addEventListener(k, this._vl[k]));
+    // iOS/data-saver browsers won't load until a gesture: prime once, then pause
+    this._prime = () => {
+      window.removeEventListener('pointerdown', this._prime, true); window.removeEventListener('touchstart', this._prime, true);
+      if (this._ready) return;
+      const pr = v.play(); if (pr && pr.then) pr.then(() => v.pause()).catch(() => {});
+    };
+    window.addEventListener('pointerdown', this._prime, true); window.addEventListener('touchstart', this._prime, true);
+    this._timers.push(setTimeout(() => { if (!this._ready && fb) fb.style.opacity = '1'; }, 7000));
+    v.src = this.VIDEO_URL; v.load();
+  }
+
+  initScroll() {
+    this._onScroll = () => this.kick();
+    this._onResize = () => { this.measure(); this.kick(); };
+    window.addEventListener('scroll', this._onScroll, { passive: true, capture: true });
+    window.addEventListener('resize', this._onResize);
+    if (window.ResizeObserver) { this._ro = new ResizeObserver(() => { this.measure(); this.kick(); }); this._ro.observe(document.body); }
+    this.measure(); this.kick();
+  }
+
+  measure() {
+    const f = document.getElementById('about'); if (!f) return;
+    const top = f.getBoundingClientRect().top + window.scrollY;
+    this._max = Math.max(1, top - 0.2 * window.innerHeight);
+  }
+
+  kick() { if (!this._raf) this._raf = requestAnimationFrame(() => this.tick()); }
+
+  tick() {
+    this._raf = 0;
+    const v = this._v;
+    this._target = this.clamp(window.scrollY / this._max, 0, 1);
+    this._cur += (this._target - this._cur) * this._smooth;
+    if (Math.abs(this._target - this._cur) < 0.0005) this._cur = this._target;
+    const end = this._end || this.VIDEO_END, t = this._cur * end;
+    let more = this._cur !== this._target;
+    if (v && this._ready && !this._failed && !this._reduce && !this._stalled) {
+      const off = Math.abs(v.currentTime - t) > 0.03;
+      if (v.seeking) {
+        more = true;
+        if (this._seekAt && performance.now() - this._seekAt > 3000) { this._stalled = true; more = false; }
+      } else if (off) {
+        v.currentTime = t; this._seekAt = performance.now(); more = true;
+      }
+    }
+    this.paintHud(t, end); this.updateNav();
+    if (more) this.kick();
+  }
+
+  paintHud(t, end) {
+    const l = document.querySelector('[data-hud-label]'), b = document.querySelector('[data-hud-bar]'), p = document.querySelector('[data-hud-pct]');
+    if (l) l.textContent = 'SYNC ' + t.toFixed(2).padStart(5, '0') + 's';
+    if (b) b.style.transform = 'scaleX(' + this._cur.toFixed(4) + ')';
+    if (p) p.textContent = String(Math.round(this._cur * 100)).padStart(3, '0') + '%';
+  }
+
+  updateNav() {
+    const ids = ['home', 'how', 'features', 'explore', 'about'], vh = window.innerHeight;
+    let act = 'home';
+    ids.forEach(id => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top <= vh * 0.5) act = id; });
+    if (act === this._act) return;
+    this._act = act;
+    document.querySelectorAll('[data-nav]').forEach(a => {
+      const on = a.getAttribute('data-nav') === act;
+      a.style.color = on ? '#fff' : 'rgba(255,255,255,.64)';
+      const d = a.querySelector('[data-nav-dot]'); if (d) d.style.opacity = on ? '1' : '0';
+    });
+  }
+
+  /* ---------- GSAP motion ---------- */
+  initMotionWhenReady() {
+    if (this._reduce) return;
+    let tries = 0;
+    const go = () => {
+      if (window.gsap) this.initMotion();
+      else if (tries++ < 60) this._timers.push(setTimeout(go, 100));
+    };
+    go();
+  }
+
+  initMotion() {
+    const g = window.gsap, ST = window.ScrollTrigger;
+    if (ST) g.registerPlugin(ST);
+    this._ctx = g.context(() => {
+      g.from('[data-header]', { y: -28, opacity: 0, duration: 1, ease: 'power3.out' });
+      g.from('[data-line]', { yPercent: 115, duration: 1.4, ease: 'expo.out', stagger: 0.14, delay: 0.2 });
+      g.from('[data-hero-in]', { y: 26, opacity: 0, duration: 1.1, ease: 'power3.out', stagger: 0.1, delay: 0.65 });
+      if (!ST) return;
+      g.to('[data-hero]', { y: -70, opacity: 0, ease: 'none', scrollTrigger: { trigger: '#home', start: 'top top', end: 'bottom 30%', scrub: true } });
+      g.utils.toArray('[data-rv]').forEach((el, i) => {
+        g.from(el, { y: 46, opacity: 0, duration: 1.1, ease: 'power3.out', delay: (i % 2) * 0.08, scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' } });
+      });
+      g.utils.toArray('[data-bar]').forEach(el => {
+        g.from(el, { scaleX: 0, transformOrigin: '0 50%', ease: 'none', scrollTrigger: { trigger: el, start: 'top 88%', end: 'top 48%', scrub: true } });
+      });
+      g.utils.toArray('[data-par]').forEach(el => {
+        g.to(el, { y: parseFloat(el.getAttribute('data-par')) * 6, ease: 'none', scrollTrigger: { trigger: '#home', start: 'top top', end: 'bottom top', scrub: true } });
+      });
+    });
+    if (ST && document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (this._ctx) ST.refresh(); });
+  }
+
+  /* ---------- explore parking ---------- */
+  liveTick() {
+    this.setState(s => {
+      const gs = s.garages.map(g => ({ ...g })), g = gs[Math.floor(Math.random() * gs.length)];
+      const d = (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 2));
+      g.open = this.clamp(g.open + d, 0, g.cap);
+      return { garages: gs };
+    });
+  }
+
+  fmt(d) { return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }); }
+
+  renderVals() {
+    const s = this.state, f = s.filter;
+    const vis = s.garages.filter(g => f === 'all' || g.tags.includes(f));
+    const sel = vis.find(g => g.id === s.sel) || vis[0] || null;
+    const setSel = id => this.setState({ sel: id, phase: 'idle', booked: null });
+    const labels = { all: 'All', ev: 'EV', acc: 'Accessible', cov: 'Covered' };
+    const tagTxt = { ev: 'EV', acc: 'ACC', cov: 'COV' };
+    const chips = Object.keys(labels).map(k => ({
+      label: labels[k], onClick: () => this.setState({ filter: k, phase: 'idle', booked: null }),
+      bg: f === k ? '#fff' : 'rgba(255,255,255,.04)', color: f === k ? '#000' : 'rgba(255,255,255,.8)', bc: f === k ? '#fff' : 'rgba(255,255,255,.2)'
+    }));
+    const rows = vis.map(g => {
+      const on = sel && sel.id === g.id;
+      return {
+        name: g.name, onSelect: () => setSel(g.id),
+        meta: g.dist + ' M · ' + g.min + ' MIN · ' + g.tags.map(t => tagTxt[t]).join(' '),
+        openText: g.open > 0 ? g.open + ' open' : 'Full', openColor: g.open > 0 ? '#35D59A' : 'rgba(255,255,255,.64)',
+        fill: g.open > 0 ? Math.max(4, Math.round(g.open / g.cap * 100)) : 0,
+        bg: on ? 'rgba(69,207,255,.09)' : 'transparent', bc: on ? 'rgba(69,207,255,.6)' : 'rgba(255,255,255,.1)'
+      };
+    });
+    const now = Date.now(), eta = sel ? new Date(now + (sel.min + 8) * 60000) : null, hold = eta ? new Date(+eta + 15 * 60000) : null;
+    const code = s.booked ? s.booked.code : '';
+    let seed = 7; for (let i = 0; i < code.length; i++) seed = (seed * 31 + code.charCodeAt(i)) >>> 0;
+    const passCells = [];
+    for (let y = 0; y < 7; y++) for (let x = 0; x < 7; x++) {
+      const fx = (x < 3 && y < 3) || (x > 3 && y < 3) || (x < 3 && y > 3);
+      let on;
+      if (fx) { const ix = x % 4, iy = y % 4; on = !(ix === 1 && iy === 1) || false; on = (ix === 1 && iy === 1) ? true : (ix === 0 || ix === 2 || iy === 0 || iy === 2); }
+      else { seed = (seed * 1103515245 + 12345) >>> 0; on = ((seed >> 16) & 1) === 1; }
+      passCells.push({ bg: on ? '#000' : '#fff' });
+    }
+    const g0 = s.garages[0], full = sel && sel.open === 0;
+    return {
+      narrow: s.narrow, showLinks: !s.narrow, showMenu: s.narrow && s.menu,
+      toggleMenu: () => this.setState(st => ({ menu: !st.menu })), closeMenu: () => this.setState({ menu: false }),
+      heroOpen: g0.open, heroFill: Math.max(4, Math.round(g0.open / g0.cap * 100)),
+      chips, rows, noRows: vis.length === 0, hasSel: !!sel,
+      isIdle: s.phase === 'idle', isBooking: s.phase === 'booking', isBooked: s.phase === 'booked',
+      selName: sel ? sel.name : '', selLevel: sel ? sel.level : '', selEta: eta ? this.fmt(eta) : '', holdUntil: hold ? this.fmt(hold) : '',
+      passCode: code, passCells,
+      reserveDisabled: !!full, reserveOpacity: full ? 0.4 : 1, reserveLabel: full ? 'FULL' : 'RESERVE SPOT',
+      reserve: () => {
+        if (!sel || sel.open === 0) return;
+        this.setState({ phase: 'booking' });
+        this._timers.push(setTimeout(() => {
+          const rnd = Math.random().toString(36).slice(2, 6).toUpperCase();
+          this.setState(st => ({
+            phase: 'booked', booked: { id: sel.id, code: 'SS-' + rnd + '-' + sel.bay },
+            garages: st.garages.map(g => g.id === sel.id ? { ...g, open: Math.max(0, g.open - 1) } : g)
+          }));
+        }, 1000));
+      },
+      resetBooking: () => this.setState(st => ({
+        phase: 'idle', booked: null, garages: st.garages.map(g => g.id === (st.booked && st.booked.id) ? { ...g, open: Math.min(g.cap, g.open + 1) } : g)
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
